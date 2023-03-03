@@ -10,7 +10,7 @@
 --| 
 --| ---------------------------------------------------------------------------
 --|
---| FILENAME      : stoplight_tb.vhd (TEST BENCH)
+--| FILENAME      : stoplight_fsm_tb.vhd (TEST BENCH)
 --| AUTHOR(S)     : Maj Jeff Falkinburg, Capt Phillip Warner, Capt Dan johnson,
 --|					**Your Name**
 --| CREATED       : Spring 2017 Last modified 06/24/2020
