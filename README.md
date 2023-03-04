@@ -19,7 +19,7 @@ The workflow uses GHDL to analyze, elaborate, and run the entity specified in th
 
 ```yaml
 env:
-  TESTBENCH_ENTITY: stoplight
+  TESTBENCH_ENTITY: stoplight_fsm
 ```
 
 If successful then GHDL will quietly exit with a `0` code.
