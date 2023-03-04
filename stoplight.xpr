@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="38" Path="C:/Users/Brian.Yarbrough/vivado/ece281-ice4/stoplight.xpr">
+<Project Version="7" Minor="38" Path="./stoplight.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="ee3bf728a5314fafa67f3868217a7484"/>
