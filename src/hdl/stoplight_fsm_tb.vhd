@@ -69,15 +69,13 @@ architecture behavior of stoplight_fsm_tb is
     
 
 	--Inputs
-	signal i_C : std_logic := '0';
-	signal i_reset : std_logic := '0';
-	signal i_clk : std_logic := '0';
+	signal w_C : std_logic := '0';
+	signal w_reset : std_logic := '0';
+	signal w_clk : std_logic := '0';
 	
-		--Outputs
-	signal o_R : std_logic;
-	signal o_Y : std_logic;
-	signal o_G : std_logic;
-	
+	--Outputs
+	signal w_stoplight : std_logic_vector(2 downto 0) := "000"; -- RYG one-hot
+		
 	-- Clock period definitions
 	constant k_clk_period : time := 10 ns;
  
@@ -85,12 +83,12 @@ begin
   	-- PORT MAPS ---------------------------------------------------
 	-- Instantiate the Unit Under Test (UUT)
    uut: stoplight_fsm port map (
-          i_C => i_C,
-          i_reset => i_reset,
-          i_clk => i_clk,
-          o_R => o_R,
-          o_Y => o_Y,
-          o_G => o_G
+          i_C => w_C,
+          i_reset => w_reset,
+          i_clk => w_clk,
+          o_R => w_stoplight(2),
+          o_Y => w_stoplight(1),
+          o_G => w_stoplight(0)
         );
 	----------------------------------------------------------------
   
@@ -98,9 +96,9 @@ begin
 	-- Clock process
 	clk_proc : process
 	begin
-		i_clk <= '0';
-		wait for k_clk_period/2;
-		i_clk <= '1';
+		w_clk <= '0';
+        wait for k_clk_period/2;
+		w_clk <= '1';
 		wait for k_clk_period/2;
 	end process;
 	
@@ -109,20 +107,36 @@ begin
 	sim_proc: process
 	begin
 		-- sequential timing		
-		i_reset <= '1';
+		w_reset <= '1';
+		wait for k_clk_period*1;
+		  assert w_stoplight = "010" report "bad reset" severity failure;
+		
+		w_reset <= '0';
 		wait for k_clk_period*1;
 		
-		i_reset <= '0';
-		wait for k_clk_period*1;
-		
-		-- alternative way of implementing Finite State Machine Inputs
-		-- starts after "wait for" statements
-		-- statements after this one start in paralell to this one
-		i_C <= '0', '1' after 40 ns, '0' after 80ns, '1' after 120 ns, '0' after 160 ns, '1' after 170 ns;
-	
-		-- one way to make using the reset easier would be to use a separate process to control it
-		wait for k_clk_period*19;
-		i_reset <= '1';
+		-- red light
+		w_C <= '0'; wait for k_clk_period;
+          assert w_stoplight = "100" report "should be red when no car" severity failure;
+		-- car shows up at red light
+        w_C <= '1'; wait for k_clk_period;
+            assert w_stoplight = "001" report "should be green when car present" severity failure;
+        wait for k_clk_period * 3; -- stay green
+            assert w_stoplight = "001" report "should be green when car present" severity failure;
+        -- go to yellow
+        w_C <= '0'; wait for k_clk_period;
+            assert w_stoplight = "010" report "should be yellow when cars done" severity failure;
+        wait for k_clk_period; -- time to go to red
+            assert w_stoplight = "100" report "did not go red after yellow" severity failure;
+        
+        -- reset and test yellow to red even if car
+        w_reset <= '1'; w_C <= '1';
+            wait for k_clk_period;
+        w_reset <= '0';
+          assert w_stoplight = "010" report "bad reset" severity failure;
+        wait for k_clk_period;
+            assert w_stoplight = "100" report "skipped red after yellow" severity failure;
+        wait for k_clk_period;
+            assert w_stoplight = "001" report "should be green when car present" severity failure;
 	
 		wait;
 	end process;
